@@ -1,0 +1,47 @@
+# -*- encoding: utf-8 -*-
+import json
+import codecs
+
+def sv(obj,p):
+    """сохранение объекта"""
+    with codecs.open(p,"w") as f:
+        json.dump(obj,f,indent=2)
+
+def ld(p):
+    """загрузка объекта"""
+    with codecs.open(p,"r") as f:
+        return json.load(f)
+data={
+	'Users':[
+		{'id':'name', 'verbose_name':u'Имя', 'type':'CharField'},
+		{'id':'paycheck', 'verbose_name':u'Зарплата', 'type':'IntegerField'},
+		{'id':'description', 'verbose_name':u'Дата поступления на работу', 'type':'DateField'},
+			]	
+	'Rooms':[
+		{'id':'department', 'verbose_name':u'Отдел', 'type':'CharField'},
+		{'id':'spots', 'verbose_name':u'Вместимость', 'type':'IntegerField'},
+			]	
+}        
+d={'users':{
+ 'title': 'Users',
+ 'fields':[
+         {'id': 'name', 'title': 'Name', 'type': 'char'},
+         {'id': 'paycheck', 'title': 'Paycheck', 'type': 'int'},
+         {'id': 'description', 'title': 'Description', 'type': 'str'},
+		]},
+	'room':{
+ 'title': 'Rooms',
+ 'fields':[
+        {'id': 'department', 'title': 'Department', 'type': 'char'},
+        {'id': 'spots', 'title': 'Spots', 'type': 'int'},
+        {'id': 'description', 'title': 'Description', 'type': 'str'},
+	]},
+ 'cars':{
+    'title': 'Cars',
+    'fields':[
+        {'id': 'brand', 'title': 'Brand', 'type': 'char'},
+        {'id': 'price', 'title': 'Price', 'type': 'int'},
+        {'id': 'description', 'title': 'Description', 'type': 'str'},
+]}}
+sv(data,"model_config.json")
+models=ld("model_config.json")
