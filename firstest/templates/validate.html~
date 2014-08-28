@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru">
+<head>
+<title>Построение пользовательских интерфейсов на основе библиотеки jQuery</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<meta name="author" content="Gennady A. Samkov" />
+<meta name="email" content="smkv@mail.ru" />
+<meta name="domain" content="linkexchanger.su" />
+<meta name="robots" content="noindex" />
+<script type="text/javascript" src="/static/js/jquery-1.2.3.js"></script>
+<script type="text/javascript" src="/static/js/jquery.form.js"></script>
+<script type="text/javascript" src="/static/js/jquery.validate.js"></script>
+<script type="text/javascript" src="/static/js/additional-methods.js"></script>
+<style type="text/css">
+* {
+    margin:0;
+    padding:0;
+}
+
+html, body {
+    background-color:#FFF;
+    font-family: "Trebuchet MS", Tahoma, Verdana, Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+}
+form {
+  margin-left:25px;
+}
+input, textarea, select {
+  display:block;
+  width:250px;
+  float:left;
+  margin-left:10px;
+  margin-bottom:15px;
+  font-family: "Trebuchet MS", Tahoma, Verdana, Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+}
+
+textarea {
+  height:50px;
+}
+label {
+  position:relative;
+  display:block;
+  text-align:right;
+  float:left;
+  width:105px;
+  padding-right:5px;
+}
+label em {
+  position:absolute;
+  right:-260px;
+  top:-15px;
+  font-size:.8em;
+  color: #f00;
+  padding: 1px;
+}
+br {
+  clear:left;
+}
+.cb, .rb {
+  width:1em;
+}
+#reset {
+  width:87px;
+  margin-left:60px;
+  margin-top:10px;
+}
+#submit {
+  width:87px;
+  height:40px;
+  margin-left:60px;
+}
+#output {
+  background-color:#F0B80D;
+  height:25px;
+  overflow:hidden;
+  padding:5px;
+  margin-bottom:15px;
+}
+</style>
+<script type="text/javascript">
+// this one requires the value to be the same as the first parameter
+	$.validator.methods.equal = function(value, element, param) {
+		return value == param;
+	};
+</script>
+</head>
+<body>
+<!-- css и javascript-коды специально размещены непосредственно на странице. -->
+
+<div id="output">AJAX-ответ от сервера заменит этот текст.</div>
+
+<form id="myForm" action="form.php" method="post">
+<label for="Name">Имя: (*)<em></em></label>
+<input id="Name" name="Name" type="text" value="" /><br />
+<label for="Email">E-mail: (*)<em></em></label>
+<input id="Email" name="Email" type="text" value="" /><br />
+<label for="Url">URL:<em></em></label>
+<input id="Url" name="Url" type="text" value="" /><br />
+<label for="Colors">Select: (*)<em></em></label>
+<select id="Colors" name="Colors">
+  <option value=""></option>
+  <option value="red">Красный</option>
+  <option value="orange">Оранжевый</option>
+  <option value="yellow">Желтый</option>
+  <option value="green">Зеленый</option>
+  <option value="blue">Голубой</option>
+  <option value="deepblue">Синий</option>
+  <option value="violet">Фиолетовый</option>
+</select><br />
+<label for="Text">Textarea: (*)<em></em></label>
+<textarea id="Text" name="Text" rows="1" cols="20"></textarea><br />
+<label for="Password">Пароль: (*)<em></em></label>
+<input id="Password" name="Password" type="password" /><br />
+<label for="ConfirmPassword">Еще раз: (*)<em></em></label>
+<input id="ConfirmPassword" name="ConfirmPassword" type="password" /><br />
+<label for="Avatar">Файл:<em></em></label>
+<input id="Avatar" name="Avatar" type="file" /><br />
+<label for="Agree">Чекбокс (*)<em></em></label>
+<input class="cb" id="Agree" name="Agree" type="checkbox" /><br />
+<label for="Radio">Радио: (*)<em></em></label>
+<input class="rb" type="radio" name="Radio" value="1" />
+<input class="rb" type="radio" name="Radio" value="2" />
+<input class="rb" type="radio" name="Radio" value="3" /><br />
+<label for="Examine">6 + 7 = (*)<em></em></label>
+<input id="Examine" name="Examine" type="text" value="" /><br />
+<input id="reset" type="reset" name="resetButton" value="Reset" />
+<input id="submit" type="image" name="submitButton" value="Submit" src="form.gif" />
+</form>
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+// ---- Форма -----
+  // готовим опции для метода
+  // ajaxSubmit плагина jquery.form.js
+  var options = { 
+  	target: "#output",
+    timeout: 3000 // тайм-аут
+  };
+  
+  $("#myForm").validate({
+  	submitHandler: function(form) {
+   	  // вызываем метод ajaxSubmit
+   	  // плагина jquery.form.js
+  	  $(form).ajaxSubmit(options);
+    },
+    focusInvalid: false,
+    focusCleanup: true,
+    rules: {
+      Name: {
+      	required: true,
+      	minlength: 2,
+      	maxlength: 12
+      },
+      Email: {
+      	required: true,
+      	email: true
+      },
+      Text: {
+      	required: true,
+      	maxlength: 24
+      },
+      Password: {
+      	required: true,
+      	rangelength: [6, 24]
+      },
+      ConfirmPassword: {
+      	required: true,
+		rangelength: [6, 24],
+		equalTo: "#Password"
+      },
+      Agree: "required",
+      Url: {
+      	url: true
+      },
+      Radio: "required",
+      Avatar: {
+      	accept: "jpg|gif|png"
+      },
+      Colors: {
+      	required: true
+      },
+      Examine: {
+      	required: true,
+      	equal: 13
+      }
+    },
+    messages: {
+      Name: {
+        required: "Укажите свое имя, пожалуйста!",
+        minlength: "Не менее 2 символов",
+        maxlength: "Не более 12 символов"
+      },
+      Email: {
+        required: "Нужно указать email адрес",
+        email: "Email адрес должен быть корректным"
+      },
+      Text: {
+      	required: "Напишите сообщение, пожалуйста!",
+        maxlength: "Не более 24 символов"
+      },
+      Password: {
+      	required: "Укажите пароль!",
+		rangelength: "Пароль - от 6 до 24 символов"
+      },
+      ConfirmPassword: {
+      	required: "Подтвердите пароль!",
+		rangelength: "Пароль - от 6 до 24 символов",
+		equalTo: "Подтверждение пароля не принято!"
+      },
+      Agree: "Соглашайтесь или уходите!",
+      Url: {
+      	url: "Введите корректный URL"
+      },
+      Radio: "Нужно сделать выбор...",
+      Avatar: {
+      	accept: "jpg, gif или png"
+      },
+      Colors: {
+      	required: "Выбирайте цвет"
+      },
+      Examine: {
+      	required: "Надо решить этот пример!",
+      	equal: "Вы в школе учились?"
+      }
+    },
+    errorPlacement: function(error, element) {
+      var er = element.attr("name");
+      error.appendTo( element.parent().find("label[@for='" + er + "']").find("em") );
+    }
+});
+// ---- Форма -----
+});
+</script>
+</body>
+</html>

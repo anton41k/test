@@ -1,0 +1,246 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="ru">
+<head>
+<linc rel="stylesheet" href="static/css/style.css" type="text/css"/>
+	<title>{%block title%}{%endblock%}</title>
+<link rel="stylesheet" type="text/css" href="/static/CSS/head.css" />	
+
+<script type="text/javascript" src="/static/js/head.js"></script>
+<script type="text/javascript" src="/static/js/jquery-1.11.1.min.js"></script>
+	
+</head>
+{%load staticfiles%}
+<body background="{%static "img/template-example-bg.gif"%}">
+{%load filter_extras%}
+
+
+
+
+<div id="table_data">
+{%for cls in data%}
+
+<ul class="model"><li><div onclick="model_show('{{cls|verbose_name_model}}')">{{cls|verbose_name_model}}</div></li></ul>
+
+{%endfor%}
+
+
+<table border=1>
+{%for class in name_class%}
+<tr>
+{%for field in class|field_name%}
+<th>
+{{field.verbose_name}}{{class}}
+</th>
+{%endfor%}
+</tr>
+<tr>
+
+<td>
+
+</td></tr>
+{%endfor%}
+</table>
+
+</div>
+
+</body>
+</html>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="ru">
+<head>
+
+	<title>test</title>
+<link rel="stylesheet" type="text/css" href="/static/CSS/head.css" />	
+
+<script type="text/javascript" src="/static/js/head.js"></script>
+<script type="text/javascript" src="/static/js/jquery-1.11.1.min.js"></script>
+	
+</head>
+{%load staticfiles%}
+<body background="{%static "img/template-example-bg.gif"%}">
+{% load url from future %}
+<script>
+function model(url){
+    $.get( url, {}, function(data) {
+        $("#table_obj").html('');
+        var headers = data[0].fields;
+        $("#table_obj").append('<tr id="header"></tr>');
+        $.each(headers, function(fieldname, field) { $("#header").append('<th>'+fieldname+'</th>');}); 
+        $.each(data, function(key, val) { 
+            $("#table_obj").append('<tr id="data'+val.pk+'"></tr>');
+            
+            $.each(val.fields, function(keys, value){
+            $.each(value, function(fieldname, field){
+                 var sfield 
+                 if (typeof field == 'string')
+                     sfield=field.replace(' ','_');
+                 else
+                     sfield=field;
+                 var sfield_pk = sfield+"_"+val.pk;
+                 if (keys=='ID')
+                     {$("#data"+val.pk).append('<td>'+field+'</td>');}
+                 else
+                 {$("#data"+val.pk).append("<td><div onclick=form_field('"+sfield+"','input"+sfield_pk+"') id='"+sfield+"'>"+field+"</div><form  hidden  id='input"+sfield_pk+"' method='post' action='' >{% csrf_token %}<input size='10' type=text id='"+val.pk+"' name='"+fieldname+"' value='"+field+"'><input id='submit' onclick=submit_field('"+val.model+"','"+sfield+"','input"+sfield_pk+"','"+fieldname+"','"+val.pk+"') type='submit' hidden></\form></td>");}
+                  });
+            }); 
+        
+        });});
+        return false;
+    }
+
+$(document).ready(function(){
+$.get('{% url 'manage' %}', function(data) {
+  $.each(data, function(index, value){
+    var anchorLink = '<li id="modelg" ><a onclick="model(\'{% url 'manage' %}json/'+index+'/\') ; return false;" href="#">' + value + '</a></li></br>';
+    $('#models').append(anchorLink);
+    }
+  )
+});
+var div = document.getElementById('tabl_data')
+var elems = div.getElementsByTagName('*')
+
+for(var i=0; i<elems.length; i++) 
+{if (elems[i].name!='name')
+elems[i].hidden=false;
+}
+
+});
+
+function showForm(form_name,div_id,input_name){
+  var form=document.forms[form_name];
+  if(form.style=='display:block')
+{form.style='display:block'}
+else
+{form.style='display:block'};
+
+  document.getElementById(div_id).hidden=true;
+if(input_name){
+  form.elements[input_name].focus();
+  form.elements[input_name].select();
+};
+}
+
+$(function (){
+
+
+$('#id').blur(function(){
+document.forms['form'].style='display:none';
+document.getElementById('as').hidden=false;});
+});
+
+$(document).ready(function(){
+         $('input#idiot').bind().blur( function(){
+             var id = $(this).attr('id');
+             var val = $(this).val();
+           switch(id)
+           {
+                 case 'idiot':
+                    var rv_name = /^[a-zA-Zа-яА-Я]+\s*[a-zA-Zа-яА-Я]+$/; 
+                    if(val.length > 2 && val != '' && rv_name.test(val))
+                    {
+                       $(this).removeClass('error').addClass('not_error');
+                       $(this).next('.error-box').text('Принято')
+                                                 .css('color','green')
+                                                 .animate({'paddingLeft':'10px'},400)
+                                                 .animate({'paddingLeft':'5px'},400);
+                    }
+                    else
+                    {
+                       $(this).removeClass('not_error').addClass('error');
+                       $(this).next('.error-box').text('&bull; поле "Имя" обязательно для заполнения<br> &bull; длина имени должна составлять не менее двух символов<br> &bull; поле должно содержать только русские или латинские буквы')
+                                                  .css('color','red')
+                                                  .animate({'paddingLeft':'10px'},400)
+                                                  .animate({'paddingLeft':'5px'},400);
+                    }
+                break;
+
+           } // end switch(...)
+         }); // end blur()        
+         $('form#form').submit(function(e){
+             e.preventDefault();
+             if($('.not_error').length > 0)
+             {  
+                 $.ajax({
+                        url: '/manage/json/users/name/1/',
+                        type: 'post',
+                        data: $(this).serialize(),
+                        beforeSend: function(xhr, textStatus){ 
+                             $('form#form :input').attr('disabled','disabled');
+                        },
+                      success: function(response){
+                            $('form#form :input').removeAttr('disabled');
+                            //$('form#form :text, textarea').val('').removeClass().next('.error-box').text('');
+                            //alert(response);
+                       }
+                }); // end ajax({...})
+            }
+            else
+            {
+              return false;
+            }
+       }); // end submit()
+      }); // end script
+function Form(model_name,id,form_id,field_name,pk){
+   hidden_field(id,form_id);
+var form=document.forms[field_name+pk];
+  form.elements[field_name].focus();
+  form.elements[field_name].select();
+         $('input#char'+field_name).bind().blur( function(){
+             var id = $(this).attr('id');
+             var val = $(this).val();
+           switch(id)
+           {
+                 case 'char'+field_name:
+                    var rv_name = /^[a-zA-Zа-яА-Я]+\s*[a-zA-Zа-яА-Я]+$/; 
+                    if(val.length > 2 && val != '' && rv_name.test(val))
+                    {
+                       $(this).removeClass('error').addClass('not_error');
+                       $(this).css('border', '2px solid green');
+                    }
+                    else
+                    {
+                       $(this).removeClass('not_error').addClass('error');
+                       $(this).css('border', '2px solid red');
+                    }
+                break;
+
+           } // end switch(...)
+         }); // end blur()        
+         $('form#'+form_id).submit(function(e){
+             e.preventDefault();
+             var  form = $('form#'+form_id);
+             if($('.not_error').length > 0)
+             {  //hidden_field(id,form_id);
+                 $.ajax({
+                        url: "/manage/json/"+model_name+"/"+field_name+"/"+pk+"/",
+                        type: 'post',
+                        data: form.serialize(),
+                      success: function(data){
+			    $("#"+id).html(data);
+                            //$('form#form :text, textarea').val('').removeClass().next('.error-box').text('');
+                            //alert(response);
+                       }
+                }); // end ajax({...})
+            }
+            else
+            {
+              return false;
+            }
+       }); // end submit()
+      }; // end script
+</script>
+
+<div id="tabl_data">{%for i in form%}
+{{i}}{%endfor%}
+</div>
+<table>
+<tr>
+<td id="models"></td>
+<td id="objects"><table id='table_obj'  border=1></table></td>
+</tr>
+</table>
+
+
+</body>
+</html>

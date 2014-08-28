@@ -1,0 +1,61 @@
+.form {
+	position: relative;
+	}
+.form div{
+	display: inline;
+	}
+.form p{
+	display: inline;
+	}
+#error-box {
+        z-index: 1000;
+	position: absolute;
+	display: block;
+        width: 300px;
+  
+	background-color: #000;
+	padding: 5px 10px 5px 10px;
+	opacity: 0.9;
+	border-radius: 5px; 
+	border: 1px solid red;
+}
+img{
+	vertical-align:middle;
+}
+.right{position: relative;}
+#add_form,p{
+	font-size:12px;	
+	margin:0px;
+
+}
+#add_form input{
+	font-size:10px;	
+	margin:0px;
+	height:11px;
+}
+#add_form input[type="submit"]{
+	height:20px;
+	font-size:12px;
+	position:absolute;
+	right:70px;	
+}
+#add_form input[type="button"]{
+	height:20px;
+	font-size:12px;
+	text-align: right;	
+	position:absolute;
+	right:0px;
+}
+
+fieldset{
+	text-align:left;
+	border: 1px solid gray;
+	padding: 15px 10px 25px 10px;
+}
+legend {
+	font-size:14px;
+	margin-right:50px; 
+	padding:0px 20px 0px 20px;
+}
+
+.calendar-cancel{	font-size:12px;}
