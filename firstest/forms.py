@@ -20,10 +20,10 @@ def fields_form(field_meta = None):
 					if field['id'] in field_meta:
 						if len(field_meta) == 1:
 							label = ''
-							data={'attrs':{'size':'10','name':field['id']}}
+							data={'attrs':{'size':'15','name':field['id']}}
 						else:
 							label = field['description']['verbose_name']
-							data={'attrs':{'size':'12','id':field['type'],'name':field['id']}}
+							data={'attrs':{'size':'20','id':field['type'],'name':field['id']}}
 						widget_form = forms.__dict__[widgets[field['type']]](**data)
 						kwargs = {'label':label,'widget':widget_form}
 						attr[field['id']] = forms.__dict__[field['type']](**kwargs)
