@@ -3,13 +3,13 @@
 <head>
 <linc rel="stylesheet" href="static/css/style.css" type="text/css"/>
 	<title>{%block title%}{%endblock%}</title>
-<link rel="stylesheet" type="text/css" href="/static/CSS/head.css" />	
+<link rel="stylesheet" type="text/css" href="/static/CSS/head.css" />
 <link rel="stylesheet" type="text/css" href="/static/CSS/calendar.css" />
 
 <script type="text/javascript" src="/static/js/calendar.js"></script>
 <script type="text/javascript" src="/static/js/head.js"></script>
 <script type="text/javascript" src="/static/js/jquery-1.11.1.min.js"></script>
-<script type="text/javascript" src="/static/js/jquery_v1.7.2.js"></script>		
+<script type="text/javascript" src="/static/js/jquery_v1.7.2.js"></script>
 </head>
 {%load staticfiles%}
 <body background="{%static "img/template-example-bg.gif"%}">
@@ -19,141 +19,57 @@ function model(url){
     $.get( url, {}, function(data) {
         var model=data[0].model;
         $("#add_obj").html('');
-        $("#add_obj").append("<tr><td onclick=Form_valid('all','','','') id='add_form'><fieldset id='form_save' hidden><legend align='left'>Новая запись</legend><form class='form_save' method='post' action='/manage/add/"+model+"/' >{%csrf_token%}<div class='add_form'></div><div class='right'><input onclick=form_save('"+model+"') type='submit' value='Сохранить'/\><input type='button' value='Отмена'/\ onclick=onblur_field('input_image','form_save')></div></form></fieldset><input id='input_image' type='image' src='{%static 'img/add.gif'%}' onclick=add_form('"+model+"')></td></tr>");
+        $("#add_obj").append("<tr><td style='position:relative' onclick=\"Form_valid('all')\" id='add_form'><fieldset id='form_save' hidden><legend align='left'>Новая запись</legend><img style='position:absolute;left:50%;top:40%;z-index:20;' hidden width='30' align='bottom' id='load' src='{%static 'img/process2.gif'%}'/><form name='total_form' class='form_save' method='post' action='/manage/add/"+model+"/' >{%csrf_token%}<div class='add_form'></div><div class='right'><input id='submit' onclick=\"form_save('"+model+"')\" type='submit' value='Сохранить'/\><input type='button' value='Отмена'/\ onclick=onblur_field('input_image','form_save')></div></form></fieldset><input id='input_image' type='image' src='{%static 'img/add.gif'%}' title='Новая запись' onclick=\"add_form('"+model+"');return false;\"></td></tr>");//'"model(\'{% url 'manage' %}json/'+index+'/\') ; return false;"'
         $("#table_obj").html('');
         var headers = data[0].fields;
         $("#table_obj").append('<tr id="header"></tr>');
         $("#header").append('<th>№</th>');
-        $.each(headers, function(field_name, fields) { $("#header").append('<th>'+field_name+'</th>');}); 
-        $.each(data, function(key, val) { 
+        $.each(headers, function(field_name, fields) { $("#header").append('<th>'+field_name+'</th>');});
+        $.each(data, function(key, val) {
             $("#table_obj").append('<tr id="data'+val.pk+'"></tr>');
             $("#data"+val.pk).append('<td>'+val.pk+'</td>');
              $.each(val.fields, function(keys, value_list){
               $.each(value_list, function(k, v){
                $.each(v.names, function(fieldname, field){
-                 var sfield 
+                 var sfield
                  if (typeof field == 'string')
-                     sfield=field.split(' ').join('_'); 
+                     sfield=field.split(' ').join('_');
                  else
                      sfield=field;
-                 var str_keys 
+                 var str_keys
                  if (typeof keys == 'string')
-                     str_keys=keys.split(' ').join('_'); 
+                     str_keys=keys.split(' ').join('_');
                  else
                      str_keys=keys;
                  var sfield_pk = sfield+"_"+val.pk;
-                 if(v.type=='DateField')
-                     {date_field="<img id='DateField"+fieldname+val.pk+"' src='{%static 'img/icon_calendar.gif'%}'/\><script type='text/javascript'>calendar.set('DateField"+fieldname+val.pk+"'); </\script>"}
-                 else{date_field=""}
-
-                 $("#data"+val.pk).append("<td onmouseover=Form_valid('"+v.type+"','"+str_keys+"','"+fieldname+"','"+val.pk+"','"+sfield_pk+"','input"+sfield_pk+"')><div onclick=hidden_field('"+sfield_pk+"','input"+sfield_pk+"','"+fieldname+"','"+model+"','"+val.pk+"','"+v.type+"') id='"+sfield_pk+"'>"+field+"</div><form class='form' name='"+fieldname+val.pk+"' hidden id='input"+sfield_pk+"' method='post' action='/manage/save/"+model+"/"+fieldname+"/"+v.type+"/"+val.pk+"/' >{% csrf_token %}<div class='input"+sfield_pk+"'></div>"+date_field+"<div id='error-box' class='error-box"+v.type+fieldname+val.pk+"' style='display:none'>&nbsp;</div><input onclick=Form_submit('"+sfield_pk+"','input"+sfield_pk+"','"+fieldname+"','"+v.type+"')  type=submit hidden></\form></td>");
+                 $("#data"+val.pk).append("<td style='position:relative' width=150 onclick=Form_valid('"+v.type+"','"+str_keys+"','"+fieldname+"','"+val.pk+"','"+sfield_pk+"','input"+sfield_pk+"')><img hidden style='position:absolute;z-index:2;' id='load"+sfield_pk+"' src='{%static 'img/720-2.GIF'%}'/><div onclick=hidden_field('"+sfield_pk+"','input"+sfield_pk+"','"+fieldname+"','"+model+"','"+val.pk+"','"+v.type+"') id='"+sfield_pk+"'>"+field+"</div><form class='form' name='"+fieldname+val.pk+"' hidden id='input"+sfield_pk+"' method='post' action='/manage/save/"+model+"/"+fieldname+"/"+v.type+"/"+val.pk+"/' >{% csrf_token %}<div class='input"+sfield_pk+"'></div><div id='error-box' class='error-box"+v.type+fieldname+val.pk+"' style='display:none'>&nbsp;</div><input onclick=Form_submit('"+sfield_pk+"','input"+sfield_pk+"','"+fieldname+"','"+v.type+"','"+val.pk+"')  type=submit hidden></\form></td>");
                   });
-            }); 
+            });
         });});});
         return false;
     }
 
-function Form_valid(field_type,ru_field_name,field_name,pk,id,form_id){
-         $('body').on('focus keyup keydown','input#'+field_type+field_name+pk+',input#CharField,input#IntegerField,input#DateField', function(eventObject){
-             var idi = $(this).attr('id');
-             var val = $(this).val();
-             if(ru_field_name)
-                 {ru_field_name=ru_field_name.split('_').join(' ') }
-             else
-                  {ru_field_name = $("label[for="+idi+"]").text();
-                      if(idi.indexOf('DateField')!=-1)
-                          {$(this).after("<script type='text/javascript'>calendar.set('DateField'); </\script>")}};
-             if(field_name=='' && $('.error-box'+idi).text()=='')
-                 {$(this).after("<div id='error-box' class='error-box"+idi+"'></div>");}
-           switch(idi)
-           {
-                 case 'CharField'+field_name+pk:
-                    var rv_name = /^[a-zA-Zа-яА-Я]+\s*[a-zA-Zа-яА-Я]+$/; 
-                    if(val.length > 2 && val != '' && rv_name.test(val) && val.length < 50)
-                    {
-                       $(this).removeClass('error').addClass('not_error'+field_name);
-                       $(this).css({'border':'1px solid green','border-radius': '3px','background-color':' silver','color': '#000'});
-                       $('.error-boxCharField'+field_name+pk).html('').css({'display': 'none'});
-                    }
-                    else
-                    {
-                       $(this).removeClass('not_error'+field_name).addClass('error');
-                       $(this).css({'border':'1px solid red','border-radius': '3px','background-color':' grey','color': '#fff'});
+$('body').on('mouseover','img#error_img,div#error-box,input#CharField,input#IntegerField,input#DateField', function(eventObject){
+    data_css={'display':'block','z-index':'5','opacity': '0.8','font-size':'12px'}
+    if(this.nodeName=='INPUT' && $(this).next().next().text()){
+        $(this).next().next().css(data_css)
+    }
+    else if(this.nodeName=='IMG'){
+        $(this).next().css(data_css);
+    }
+});
 
-                       $('.error-boxCharField'+field_name+pk).html('&bull; поле "'+ru_field_name+'" обязательно для заполнения<br> &bull; длина имени должна составлять не менее двух символов<br> &bull; поле должно содержать только русские или латинские буквы').css({'color':'red','font-size':'9px'}).show();
-                    }
-                break;
-                 case 'IntegerField'+field_name+pk:
-                    var rv_name = /^[0-9]+$/; 
-                    if(val != '' && rv_name.test(val))
-                    {
-                       $(this).removeClass('error').addClass('not_error'+field_name);
-                       $(this).css({'border':'1px solid green','border-radius': '3px','background-color':' silver','color': '#000'});
-                       $('.error-boxIntegerField'+field_name+pk).html('').css({'display': 'none'});
-                    }
-                    else
-                    {
-                       $(this).removeClass('not_error'+field_name).addClass('error');
-                       $(this).css({'border':'1px solid red','border-radius': '3px','background-color':' grey','color': '#fff'});
+$('body').on('mouseout','img#error_img,div#error-box,input#CharField,input#IntegerField,input#DateField', function(eventObject){
+    data_css={'display':'none','z-index':'2','opacity': '0.7','font-size':'10px'}
+    if(this.nodeName=='INPUT' && $(this).next().next().text()){
+        $(this).next().next().css(data_css)
+    }
+    else if(this.nodeName=='IMG'){
+        $(this).next().css(data_css);
+    }
+});
 
-                       $('.error-boxIntegerField'+field_name+pk).html('&bull; поле "'+ru_field_name+'" обязательно для заполнения<br>&bull; поле должно содержать только цифры').css({'color':'red','font-size':'9px'}).show();
-                    }
-                break;
-                    case 'DateField'+field_name+pk:
-                    var rv_name = /^(19|20)\d\d-((0[1-9]|1[012])-(0[1-9]|[12]\d)|(0[13-9]|1[012])-30|(0[13578]|1[02])-31)$/; 
-                    if(val != '' && rv_name.test(val))
-                    {
-                       $(this).removeClass('error').addClass('not_error'+field_name);
-                       $(this).css({'border':'1px solid green','border-radius': '3px','background-color':' silver','color': '#000'});
-                       $('.error-boxDateField'+field_name+pk).html('').css({'display': 'none'});
-                    }
-                    else
-                    {
-                       $(this).removeClass('not_error'+field_name).addClass('error');
-                       $(this).css({'border':'1px solid red','border-radius': '3px','background-color':' grey','color': '#fff'});
 
-                       $('.error-boxDateField'+field_name+pk).html('&bull; поле "'+ru_field_name+'" обязательно для заполнения<br>&bull; дата должна быть в формате yyyy-mm-dd').css({'color':'red','font-size':'9px'}).show();
-                    }
-                break;
-
-           } // end switch(...)
-         }); // end keyup() 
-    if(field_type!='DateField')
-        { $('input#'+field_type+field_name+pk).focus();}
-    $('input#'+field_type+field_name+pk+',input#CharField,input#IntegerField,input#DateField').bind('blur', function(){
-      var idi = $(this).attr('id');
-      if(field_name=='')
-          {$('.error-box'+idi).css({'display': 'none'})}
-      else
-          {date=field_type;
-           onblur_field(id,form_id,date)}
-    }); 
-    
-};
-
-function Form_submit(id,form_id,field_name,field_type){    
-         $('form#'+form_id).submit(function(e){
-             e.preventDefault();
-             var  form = $('form#'+form_id);
-             var action=$(this).attr('action');
-             if($('.not_error'+field_name).length > 0)
-             {
-                 $.ajax({
-                        url: action,
-                        type: 'post',
-                        data: form.serialize(),
-                      success: function(data){
-			    $("#"+id).html(data);
-                       }
-                }); // end ajax({...})
-            if(field_type=='DateField'){date='DateField'}else{date=''}
-            onblur_field(id,form_id,date);}
-            else
-            {
-              return false;
-            }
-       }); // end submit()
-       };// end script
 
 
 $(document).ready(function(){
@@ -161,19 +77,18 @@ $.get('{% url 'manage' %}', function(data) {
   $.each(data, function(index, value){
     var anchorLink = '<li><a onclick="model(\'{% url 'manage' %}json/'+index+'/\') ; return false;" href="#">' + value + '</a></li></br>';
     $('#models').append(anchorLink);
- 
-});});});
+
+});});
+});
 
 </script>
+
 </br></br>
-<script>
-
-</script>
 
 <table>
 <tr>
 <td id="models"></td>
-<td id="objects"><table id='table_obj'  border=1></table></td>
+<td id="objects"><table id='table_obj'></table></td>
 </tr>
 <tr>
 <td></td>
