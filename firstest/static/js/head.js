@@ -8,7 +8,7 @@ function hidden_field(data_field,input_field,input_name,model_name,pk,field_type
                 unblock_form(data_field);
                 document.getElementById(data_field).hidden = true;
                 $("."+input_field).html(data);
-                size=$('input#'+field_type+input_name+pk).val().length;
+                var size=$('input#'+field_type+input_name+pk).val().length;
                 $('input#'+field_type+input_name+pk).attr('size',size);
                 if(field_type=='DateField')
                 {
@@ -87,8 +87,8 @@ function Form_valid(field_type,ru_field_name,field_name,pk,id,form_id){
             });
         }
     else{
-        $(document).click(function (event) {//alert(typeof(String(1)))
-                str=(!$(event.target).attr('id')) ? String($(event.target).attr('id')):$(event.target).attr('id');
+        $(document).click(function (event) {
+                var str=(!$(event.target).attr('id')) ? String($(event.target).attr('id')):$(event.target).attr('id');
                 if ($(event.target).closest('#'+form_id).length == 0 && str.indexOf(id)==-1 && $(event.target).attr('id')!='calendarday') {
                     onblur_field(id,form_id)
                 }
@@ -183,7 +183,6 @@ function Form_submit(id,form_id,field_name,field_type,pk){
                             onblur_field(id,form_id,date);
                        }
                 }); // end ajax({...})
-
             }
             else
             {
@@ -214,10 +213,10 @@ function form_save(model_name) {
         else
             {block_form();
                 $('form.form_save :text').each(function(i,elem) {
-                    id=$(elem).attr('id');
+                    var id=$(elem).attr('id');
                     if(id){
-                        val = $(elem).val();
-                        ths = $(elem)
+                        var val = $(elem).val();
+                        var ths = $(elem)
                         each_id(id,val,ths)
 
                 }
