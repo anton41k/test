@@ -8,10 +8,11 @@ function hidden_field(data_field,input_field,input_name,model_name,pk,field_type
                 unblock_form(data_field);
                 document.getElementById(data_field).hidden = true;
                 $("."+input_field).html(data);
-                //unblock_form(data_field);
+                size=$('input#'+field_type+input_name+pk).val().length;
+                $('input#'+field_type+input_name+pk).attr('size',size);
                 if(field_type=='DateField')
                 {
-                    $('input#DateField'+input_name+pk).after("<img id='DateField' src='/static/img/icon_calendar.gif'><script type='text/javascript'>calendar.set('DateField','DateField"+input_name+pk+"','"+input_name+pk+"'); </\script>");//
+                    $('input#DateField'+input_name+pk).after("<img id='DateField"+pk+"' src='/static/img/icon_calendar.gif'><script type='text/javascript'>calendar.set('DateField"+pk+"','"+input_name+"','"+input_name+pk+"'); </\script>");//
                 }
                 else{
                     $('input#'+field_type+input_name+pk).focus();
@@ -24,20 +25,21 @@ function hidden_field(data_field,input_field,input_name,model_name,pk,field_type
          }
 
 }
-    //if(field_type!='DateField')
-        //{ $('input#'+field_type+input_name+pk).focus();}
+
 function onblur_field(div_field,form_field,date){
     document.getElementById(div_field).hidden = false;
     document.getElementById(form_field).hidden = true;
     if(date && date=='DateField')
-       {calendar.hideCalendar()}
+       {$('.calendar-box').hide();}
 }
-function block_form(id='') {
+function block_form(id) {
+    if(!id){id = ''}
     $("#load"+id).show();
     $('input').attr('disabled', true);
     }
 
-function unblock_form(id='') {
+function unblock_form(id) {
+    if(!id){id = ''}
     $('#load'+id).hide();
     $('input').removeAttr('disabled');
             }
@@ -49,38 +51,52 @@ function add_form(model_name){
         function(data){
             unblock_form();
             $(".add_form").html(data);
-            $('input#DateField').after("<img id='DateField1' src='/static/img/icon_calendar.gif'><script type='text/javascript'>calendar.set('DateField1','DateField','total_form'); </script>");
+            $('input#DateField').after("<img id='DateFieldall' src='/static/img/icon_calendar.gif'><script type='text/javascript'>calendar.set('DateFieldall','DateField','total_form'); </script>");
 
 });
 }
 
-function Form_valid(field_type,ru_field_name='',field_name='',pk='',id='',form_id=''){
+
+
+function Form_valid(field_type,ru_field_name,field_name,pk,id,form_id){
+        if(!field_name){field_name='',pk='',id='',form_id=''}
         if(field_type=='all'){
-            events='blur keyup keydown';
-            param='input#CharField,input#IntegerField,input#DateField';
+            var events='blur';
+            var param='input#CharField,input#IntegerField,input#DateField';
             css_param='none';
             }
-        else{events='focus keyup keydown'
-             param='input#'+field_type+field_name+pk
+        else{events='focus keyup'
+             var param='input#'+field_type+field_name+pk
              css_param='block';
             }
-         $('body').on(events,param, function(eventObject){
+        $('body').on(events,param, function(eventObject){
              var idi = $(this).attr('id');
              var val = $(this).val();
              var ths = $(this)
+             var len=(!val.length) ? 1:val.length;
+             if(field_type!='all'){$(this).attr('size',len);}
             each_id(idi,val,ths,ru_field_name,field_name,pk);
-         }); // end keyup()
+        }); // end keyup()
+    if(field_type != 'DateField'){
 
-    $('body').on('blur','input#'+field_type+field_name+pk, function(){
-      var idi = $(this).attr('id');
+        $('body').on('blur','input#'+field_type+field_name+pk, function(){
+              var idi = $(this).attr('id');
 
-      $('.error-box'+idi).css({'display': 'none'});
-      if(field_type=='DateField'){date='DateField'}else{date=''}
-      onblur_field(id,form_id,date)
-    });
-
+              $('.error-box'+idi).css({'display': 'none'});
+              onblur_field(id,form_id)
+            });
+        }
+    else{
+        $(document).click(function (event) {//alert(typeof(String(1)))
+                str=(!$(event.target).attr('id')) ? String($(event.target).attr('id')):$(event.target).attr('id');
+                if ($(event.target).closest('#'+form_id).length == 0 && str.indexOf(id)==-1 && $(event.target).attr('id')!='calendarday') {
+                    onblur_field(id,form_id)
+                }
+            });
+        }
 };
 function each_id(idi,val,ths,ru_field_name,field_name,pk){
+            if(!pk){pk = ''}
             if(ru_field_name)
                  {ru_field_name=ru_field_name.split('_').join(' ') }
              else
@@ -202,7 +218,7 @@ function form_save(model_name) {
                     if(id){
                         val = $(elem).val();
                         ths = $(elem)
-                        each_id(id,val,ths,'','','')
+                        each_id(id,val,ths)
 
                 }
                 });
